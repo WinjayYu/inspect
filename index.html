@@ -20,19 +20,19 @@
     <p class="call"></p>
   </div>
   <div class="content">
-    <form id="form_data" action="http://localhost:3000/aaa" method="post">
+    <form id="form_data" method="post" onsubmit="handleSubmit()">
       <div class="target">
         <p class="target_name">评价医院</p>
         <div class="ques_content">
           <div class="wrap_input">
             <input class="hospital_val" id="hospital1" type="radio" name="target"
-                   value="201712151012092050000000000000000069"> 中医院
+                   value="201712151012092050000000000000000069" required> 中医院
           </div>
         </div>
         <div class="ques_content">
           <div class="wrap_input">
           <input class="hospital_val" id="hospital2" type="radio" name="target"
-                 value="201712151012258450000000000000000071"> 县医院
+                 value="201712151012258450000000000000000071" required> 县医院
         </div>
         </div>
       </div>
@@ -42,8 +42,12 @@
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>
+  var ajaxData;
   $(document).ready(function () {
     var $form = $('form');
+    $('#submit').click(function(e){
+      e.preventDefault();
+    });
     $.ajax({
       url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetSurvey",
       type: "POST",
@@ -51,8 +55,8 @@
       contentType: "application/json",
       data: JSON.stringify({"PK_QID": "201712061900217820000000000000000026"}),
       success: function (res) {
-        console.log(res);
         if (res.ErrCode === 200) {
+          ajaxData = res.Data;
           $('.q_name').text(res.Data.QName);
           $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
           var top = res.Data.Topic;
@@ -70,7 +74,7 @@
               renderGrade(top[i]);
             }
           }
-          $form.append('<div class="form_submit"><input type="submit" value="提交"></div>');
+          $form.append('<div id="submit" class="form_submit"><input type="submit" value="提交"></div>');
         }
       },
       error: function (res) {
@@ -79,9 +83,9 @@
 
     // 描述
     function renderDes(data) {
-      var template = '<div class="item des">' +
-                              '<p class="ques_title">data.TTitle</p>' +
-                              '</div>';
+      var template = `<div class="item des" pk_tid="${data.PK_TID}">
+                              <p class="ques_title">${data.TTitle}</p>
+                              </div>`;
       $form.append(template)
     }
 
@@ -94,16 +98,16 @@
       var option = data.Option;
       var sub = '';
       for (let i = 0; i < option.length; i++) {
-        sub += renderSubRad(option[i], data.PK_TID, isRequired)
+        sub += renderSubRad(option[i], data.PK_TID, isRequired, data.OType)
       }
       $form.append(template + sub + '</div>');
     }
 
     // 单选子选项
-    function renderSubRad(data, name, isRequired) {
+    function renderSubRad(data, name, isRequired, OType) {
       return `<div class="ques_content">
               <div class="wrap_input">
-                <input type="radio" name="${name}" value="${data.PK_OID}" ${isRequired}> ${data.TTitle}
+                <input type="radio" PK_TID="${name}" OType="${OType}" name="${name}" value="${data.PK_OID}" ${isRequired}> ${data.TTitle}
               </div>
               </div>`
     }
@@ -116,16 +120,16 @@
       var option = data.Option;
       var sub = '';
       for (var i = 0; i < option.length; i++) {
-        sub += renderSubChe(option[i], data.PK_TID, isRequired);
+        sub += renderSubChe(option[i], data.PK_TID, isRequired, data.OType);
       }
       $form.append(template + sub + '</div>')
     }
 
-    function renderSubChe(data, name, isRequired) {
+    function renderSubChe(data, name, isRequired, OType) {
       return `
               <div class="ques_content">
               <div class="wrap_input">
-              <input type="checkbox" name=${name} value="${data.PK_OID} ${isRequired}" > ${data.TTitle}
+              <input type="checkbox" OType="${OType}" PK_TID="${name}" name=${name} value="${data.PK_OID} ${isRequired}" > ${data.TTitle}
               </div>
               </div>`
     }
@@ -133,44 +137,134 @@
     // 评分
     function renderGrade(data) {
       var isRequired = data.IsRequired === 0 ? '' : 'required';
-      var template = `<div class="item grade clear">
+      var template = `<div class="item grade clear" TTitle="${data.TTitle}">
                       <p class="ques_title">${data.TTitle}</p>`;
       var option = data.Option;
       var sub = '';
       for (var i = 0; i < option.length; i++) {
-        sub += renderSubGra(option[i], data.PK_TID, isRequired, i);
+        sub += renderSubGra(option[i], data.PK_OID, data.PK_TID, isRequired, i);
       }
       $form.append(template + sub + '</div>')
     }
 
-    function renderSubGra(data, name, isRequired, index) {
-      var pre = `<p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input clear">`;
+    function renderSubGra(data, PK_OID, PK_TID, isRequired, index) {
+      var pre = `<div class="grade_item">
+                <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input clear">`;
       var temp = '';
       for (var i = 0; i < 10; i++) {
-        temp += `<div id="${name}" data-name=${name} class="grade_number">${i + 1}</div>`;
+        temp += `<div id="${PK_OID}" PK_OID="${PK_OID}" PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
       }
-      return pre + temp + '</div>';
+      return pre + temp + '</div></div>';
     }
   })
 
   function getGrade(index) {
    $('body').on('click', '.grade_number', function (v) {
-     $('.grade_number').removeClass('selected')
-     console.log($(this).text());
-     console.log($(this).attr('data-name'));
+     $(this).siblings().removeClass('selected');
      $(this).addClass('selected')
    })
+
   }
   getGrade();
   
   function handleSubmit() {
-    
+    return false;
   }
 
-  $( "#form_data" ).submit(function( event ) {
-   console.log( $( this ).serializeArray() )
+  $( "#form_data").submit(function( event ) {
+    var res = {Result: []};
+
+    // 判断是否评分
+    $('.grade').find('.grade_item').each( function(i, v){
+      if(!$(this).find('div').hasClass('selected')) {
+        alert('请评分！');
+        return;
+      }
+    })
+
+    $('input[type="radio"][name!="target"]:checked').each(function (index, value) {
+      var type = $(value).attr('type');
+      if(type = 'redio') {
+        res.Result.push(radioData($(value)));
+      }
+    });
+
+    var checkboxNames = [];
+    $('input[type="checkbox"]:checked').each(function (index, value) {
+      checkboxNames.push($(value).attr('name'));
+    });
+    checkboxNames = Array.from(new Set(checkboxNames));
+    console.log(checkboxNames);
+
+    for(var i=0; i<checkboxNames.length; i++) {
+      var temp = {SelectedOption: []}
+      $('input[name=' + checkboxNames[i] + ']:checked').each(function (index, value) {
+        temp.OType = $(value).attr('OType');
+        temp.PK_TID = $(value).attr('PK_TID');
+        temp.SelectedOption.push(checkboxData($(value)));
+      });
+      res.Result.push(temp);
+    }
+    console.log(res);
+
+    var gradeData = {SelectedOption: []}
+    $('.grade_item').each(function (i, v) {
+      gradeData.OType = 3;
+      gradeData.PK_TID = $(v).attr('PK_TID');
+      gradeData.SelectedOption.push({"OptionScoreValue": $(v).find('selected').val()});
+      gradeData.SelectedOption.push({"PK_OID": $(v).find('selected').attr('PK_OID')});
+    })
+
+    res.PK_QID = ajaxData.PK_QID;
+    res.PK_EID = $('input[name="target"]:checked').attr('value');
+
+    postAjax(res);
+
     event.preventDefault();
   });
+
+  // 单选数据处理
+  function radioData(data) {
+    var obj = {SelectedOption: []};
+    obj.OType = data.attr('OType');
+    obj.PK_TID = data.attr('PK_TID');
+    obj.SelectedOption.push({"PK_OID": data.attr('value')});
+    return obj;
+  }
+
+  // 多选数据处理
+  function checkboxData(data) {
+    var SelectedOption = {};
+    SelectedOption.PK_OID = data.attr('value');
+    return SelectedOption;
+  }
+
+  function postAjax(data) {
+    console.log('000', JSON.stringify(data));
+    $.ajax({
+      url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
+      type: "POST",
+      headers: {
+        'Auth': 'r78rzVUf0dYQQYjwNEzGHbmvVNe8EkZetJOsh5YFz%2fxOqL4Yx%2f5IgLsGfle1akRmI2i7%2bzr%2fXJIEa3jrXBdvYATECm75NiUm'
+      },
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify(data),
+      success: function (res) {
+        if(res.ErrCode === 200) {
+          alert('提交成功');
+//          window.location.reload(true);
+        } else {
+          alert(res.ErrMsg);
+        }
+      },
+      error: function (res) {
+        alert('提交失败')
+      }
+      }
+    )
+  }
+
 </script>
 </body>
 </html>
