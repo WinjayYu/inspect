@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" content='text/html;charset=utf-8'/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="format-detection" content="telephone=no,address=no"/>
+  <title>问卷调查</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/style.css">
+
+  <link href="https://cdn.bootcss.com/jquery-bar-rating/1.2.2/themes/bars-horizontal.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <p class="q_name"></p>
+    <p class="call"></p>
+  </div>
+  <div class="content">
+    <form id="form_data" action="http://localhost:3000/aaa" method="post">
+      <div class="target">
+        <p class="target_name">评价医院</p>
+        <div class="ques_content">
+          <div class="wrap_input">
+            <input class="hospital_val" id="hospital1" type="radio" name="target"
+                   value="201712151012092050000000000000000069"> 中医院
+          </div>
+        </div>
+        <div class="ques_content">
+          <div class="wrap_input">
+          <input class="hospital_val" id="hospital2" type="radio" name="target"
+                 value="201712151012258450000000000000000071"> 县医院
+        </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+  $(document).ready(function () {
+    var $form = $('form');
+    $.ajax({
+      url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetSurvey",
+      type: "POST",
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({"PK_QID": "201712061900217820000000000000000026"}),
+      success: function (res) {
+        console.log(res);
+        if (res.ErrCode === 200) {
+          $('.q_name').text(res.Data.QName);
+          $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
+          var top = res.Data.Topic;
+          for (let i = 0; i < top.length; i++) {
+            if (top[i].OType === 4) {
+              renderDes(top[i]);
+            }
+            if (top[i].OType === 0) {
+              renderRadio(top[i]);
+            }
+            if (top[i].OType === 1) {
+              renderCheckBox(top[i]);
+            }
+            if (top[i].OType === 3) {
+              renderGrade(top[i]);
+            }
+          }
+          $form.append('<div class="form_submit"><input type="submit" value="提交"></div>');
+        }
+      },
+      error: function (res) {
+      }
+    });
+
+    // 描述
+    function renderDes(data) {
+      var template = '<div class="item des">' +
+                              '<p class="ques_title">data.TTitle</p>' +
+                              '</div>';
+      $form.append(template)
+    }
+
+    //单选
+    function renderRadio(data) {
+      var isRequired = data.IsRequired === 0 ? '' : 'required';
+      var template = `<div class="item rad">
+                             <p class="ques_title">${data.TTitle}</p>
+                            `;
+      var option = data.Option;
+      var sub = '';
+      for (let i = 0; i < option.length; i++) {
+        sub += renderSubRad(option[i], data.PK_TID, isRequired)
+      }
+      $form.append(template + sub + '</div>');
+    }
+
+    // 单选子选项
+    function renderSubRad(data, name, isRequired) {
+      return `<div class="ques_content">
+              <div class="wrap_input">
+                <input type="radio" name="${name}" value="${data.PK_OID}" ${isRequired}> ${data.TTitle}
+              </div>
+              </div>`
+    }
+
+    // 多选
+    function renderCheckBox(data) {
+      var isRequired = data.IsRequired === 0 ? '' : 'required';
+      var template = `<div class="item che">
+                              <p class="ques_title">${data.TTitle}</p>`;
+      var option = data.Option;
+      var sub = '';
+      for (var i = 0; i < option.length; i++) {
+        sub += renderSubChe(option[i], data.PK_TID, isRequired);
+      }
+      $form.append(template + sub + '</div>')
+    }
+
+    function renderSubChe(data, name, isRequired) {
+      return `
+              <div class="ques_content">
+              <div class="wrap_input">
+              <input type="checkbox" name=${name} value="${data.PK_OID} ${isRequired}" > ${data.TTitle}
+              </div>
+              </div>`
+    }
+
+    // 评分
+    function renderGrade(data) {
+      var isRequired = data.IsRequired === 0 ? '' : 'required';
+      var template = `<div class="item grade clear">
+                      <p class="ques_title">${data.TTitle}</p>`;
+      var option = data.Option;
+      var sub = '';
+      for (var i = 0; i < option.length; i++) {
+        sub += renderSubGra(option[i], data.PK_TID, isRequired, i);
+      }
+      $form.append(template + sub + '</div>')
+    }
+
+    function renderSubGra(data, name, isRequired, index) {
+      var pre = `<p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input clear">`;
+      var temp = '';
+      for (var i = 0; i < 10; i++) {
+        temp += `<div id="${name}" data-name=${name} class="grade_number">${i + 1}</div>`;
+      }
+      return pre + temp + '</div>';
+    }
+  })
+
+  function getGrade(index) {
+   $('body').on('click', '.grade_number', function (v) {
+     $('.grade_number').removeClass('selected')
+     console.log($(this).text());
+     console.log($(this).attr('data-name'));
+     $(this).addClass('selected')
+   })
+  }
+  getGrade();
+  
+  function handleSubmit() {
+    
+  }
+
+  $( "#form_data" ).submit(function( event ) {
+   console.log( $( this ).serializeArray() )
+    event.preventDefault();
+  });
+</script>
+</body>
+</html>

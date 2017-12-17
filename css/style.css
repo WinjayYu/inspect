@@ -1,0 +1,108 @@
+.container {
+  background-color: #f4f5f7;
+}
+
+.container .header {
+  padding: 20px 15px 15px;
+  background-color: #fff;
+}
+
+.container .header .q_name {
+  color: #4d526c;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.container .header .call {
+  margin-top: 10px;
+  color: #8a96a6;
+  line-height: 23px;
+}
+
+.container .content .target{
+  background-color: #fff;
+  margin-top: 20px;
+}
+
+.container .content .target .target_name {
+  padding: 20px 15px 15px;
+  font-size: 17px;
+  color: #4d526c;
+  line-height: 15px;
+  border-bottom: 1px #d2d2d2 solid;
+}
+
+.container .content .target .fl {
+  width:  50%;
+  padding: 20px 0 0 15px;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.container .content .target label{
+  vertical-align: 1px;
+}
+
+.container .item {
+  background-color: #fff;
+  padding-top: 15px;
+  margin-top: 6px;
+}
+
+.container .item .ques_title {
+  line-height: 20px;
+  border-bottom: 1px #d2d2d2 solid;
+  padding: 0 15px 10px;
+  font-size: 17px;
+  color: #4d526c;
+}
+
+.container .wrap_input {
+  padding: 0 15px;
+}
+
+.container .ques_content {
+  margin-top: 10px;
+  color: #4d526c;
+  font-size: 15px;
+}
+
+
+.container .item .grade_number {
+  float: left;
+  width: 10%;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+}
+
+.container .item .ques_sub_title {
+  padding: 0 15px;
+  color: #4d526c;
+}
+
+.container .selected {
+  background-color: #378efa;
+  color: #fff;
+}
+
+.container textarea {
+  width: 100%;
+  margin-top: 20px;
+  height: 50px;
+}
+
+.form_submit {
+  background-color: #fff;
+  padding: 20px 0;
+}
+
+input[type="submit"] {
+  width: 90%;
+  background-color: #378efa;
+  margin-left: 5%;
+  height: 30px;
+  line-height: 30px;
+  color: #fff;
+  border-radius: 2px;
+}
