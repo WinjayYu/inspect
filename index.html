@@ -142,17 +142,17 @@
       var option = data.Option;
       var sub = '';
       for (var i = 0; i < option.length; i++) {
-        sub += renderSubGra(option[i], data.PK_OID, data.PK_TID, isRequired, i);
+        sub += renderSubGra(option[i], data.PK_TID, isRequired, i);
       }
       $form.append(template + sub + '</div>')
     }
 
-    function renderSubGra(data, PK_OID, PK_TID, isRequired, index) {
+    function renderSubGra(data, PK_TID, isRequired, index) {
       var pre = `<div class="grade_item">
                 <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input clear">`;
       var temp = '';
       for (var i = 0; i < 10; i++) {
-        temp += `<div id="${PK_OID}" PK_OID="${PK_OID}" PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
+        temp += `<div PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
       }
       return pre + temp + '</div></div>';
     }
@@ -209,11 +209,14 @@
 
     var gradeData = {SelectedOption: []}
     $('.grade_item').each(function (i, v) {
+      console.log($(v).find('.wrap_input .selected').text());
       gradeData.OType = 3;
       gradeData.PK_TID = $(v).attr('PK_TID');
-      gradeData.SelectedOption.push({"OptionScoreValue": $(v).find('selected').val()});
-      gradeData.SelectedOption.push({"PK_OID": $(v).find('selected').attr('PK_OID')});
+      gradeData.SelectedOption.push({"OptionScoreValue": $(v).find('.wrap_input .selected').text()});
+      gradeData.SelectedOption.push({"PK_TID": $(v).find('.wrap_input  .selected').attr('PK_TID')});
     })
+
+    res.Result.push(gradeData);
 
     res.PK_QID = ajaxData.PK_QID;
     res.PK_EID = $('input[name="target"]:checked').attr('value');
