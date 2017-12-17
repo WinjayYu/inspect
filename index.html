@@ -43,7 +43,17 @@
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script>
   var ajaxData;
-  $(document).ready(function () {
+  var Auth, PK_QID;
+
+  function loadAuth(au, pk) {
+    if(au && pk) {
+      Auth = au;
+      PK_QID = pk;
+      renderPage(Auth, PK_QID);
+    }
+  }
+
+  function renderPage(PK_QID) {
     var $form = $('form');
     $('#submit').click(function(e){
       e.preventDefault();
@@ -53,7 +63,7 @@
       type: "POST",
       dataType: "json",
       contentType: "application/json",
-      data: JSON.stringify({"PK_QID": "201712061900217820000000000000000026"}),
+      data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
         if (res.ErrCode === 200) {
           ajaxData = res.Data;
@@ -156,7 +166,7 @@
       }
       return pre + temp + '</div></div>';
     }
-  })
+  }
 
   function getGrade(index) {
    $('body').on('click', '.grade_number', function (v) {
@@ -248,7 +258,7 @@
       url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
       type: "POST",
       headers: {
-        'Auth': 'r78rzVUf0dYQQYjwNEzGHbmvVNe8EkZetJOsh5YFz%2fxOqL4Yx%2f5IgLsGfle1akRmI2i7%2bzr%2fXJIEa3jrXBdvYATECm75NiUm'
+        'Auth': au
       },
       dataType: "json",
       contentType: "application/json",
