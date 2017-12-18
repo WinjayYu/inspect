@@ -22,19 +22,7 @@
   <div class="content">
     <form id="form_data" method="post" onsubmit="handleSubmit()">
       <div class="target">
-        <p class="target_name">评价医院</p>
-        <div class="ques_content">
-          <div class="wrap_input">
-            <input class="hospital_val" id="hospital1" type="radio" name="target"
-                   value="201712151012092050000000000000000069" required> 中医院
-          </div>
-        </div>
-        <div class="ques_content">
-          <div class="wrap_input">
-          <input class="hospital_val" id="hospital2" type="radio" name="target"
-                 value="201712151012258450000000000000000071" required> 县医院
-        </div>
-        </div>
+        <p class="target_name">评价对象</p>
       </div>
 
     </form>
@@ -49,12 +37,13 @@
     if(au && pk) {
       Auth = au;
       PK_QID = pk;
-      renderPage(Auth, PK_QID);
+      renderPage();
     }
   }
 
-  function renderPage(PK_QID) {
+  function renderPage() {
     var $form = $('form');
+    var $target = $('.target');
     $('#submit').click(function(e){
       e.preventDefault();
     });
@@ -70,7 +59,12 @@
           $('.q_name').text(res.Data.QName);
           $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
           var top = res.Data.Topic;
-          for (let i = 0; i < top.length; i++) {
+          var target = res.Data.Target;
+          for(var j = 0; j < target.length; j++) {
+            renderTarget(target[j], true);
+          }
+
+          for (var i = 0; i < top.length; i++) {
             if (top[i].OType === 4) {
               renderDes(top[i]);
             }
@@ -91,6 +85,16 @@
       }
     });
 
+    // 评价对象
+    function renderTarget(data) {
+      var template = `<div class="ques_content">
+                    <div class="wrap_input">
+                    <input class="hospital_val" PK_EID="${data.PK_EID}" EName="${data.EName}" type="radio" name="target" required> ${data.EName}
+                    </div>
+                    </div>`
+      $target.append(template);
+    }
+
     // 描述
     function renderDes(data) {
       var template = `<div class="item des" pk_tid="${data.PK_TID}">
@@ -107,10 +111,10 @@
                             `;
       var option = data.Option;
       var sub = '';
-      for (let i = 0; i < option.length; i++) {
+      for (var i = 0; i < option.length; i++) {
         sub += renderSubRad(option[i], data.PK_TID, isRequired, data.OType)
       }
-      $form.append(template + sub + '</div>');
+        $form.append(template + sub + '</div>');
     }
 
     // 单选子选项
@@ -167,6 +171,7 @@
       return pre + temp + '</div></div>';
     }
   }
+
 
   function getGrade(index) {
    $('body').on('click', '.grade_number', function (v) {
@@ -229,7 +234,7 @@
     res.Result.push(gradeData);
 
     res.PK_QID = ajaxData.PK_QID;
-    res.PK_EID = $('input[name="target"]:checked').attr('value');
+    res.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
     postAjax(res);
 
@@ -258,7 +263,7 @@
       url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
       type: "POST",
       headers: {
-        'Auth': au
+        'Auth': Auth
       },
       dataType: "json",
       contentType: "application/json",
@@ -266,7 +271,7 @@
       success: function (res) {
         if(res.ErrCode === 200) {
           alert('提交成功');
-//          window.location.reload(true);
+          android.showToast(JSON.stringify(res));
         } else {
           alert(res.ErrMsg);
         }
