@@ -111,3 +111,38 @@ input[type="submit"] {
   color: #fff;
   border-radius: 2px;
 }
+
+.container .wrap_grade {
+
+}
+
+.container .item .satisfaction{
+  padding: 0 15px;
+}
+
+.container .item .satisfaction .satisfaction_text {
+  width: 33.3333%;
+  color: #4d526c;
+}
+
+.container .text_middle {
+  text-align: center;
+}
+
+.container .text_right {
+  text-align: right;
+}
+
+.container .wrap_grade_item {
+  height: 63px;
+  line-height: 63px;
+  text-align: center;
+  width: 20%;
+}
+
+.container .wrap_grade_item .grade_item_number {
+  width: 100%;
+  background: url("../images/score_thumb_2.png") no-repeat center;
+  height: 63px;
+  background-size: 100%;
+}

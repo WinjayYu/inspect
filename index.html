@@ -131,12 +131,14 @@ console.log(res)
     function renderCheckBox(data) {
       var isRequired = data.IsRequired === 0 ? '' : 'required';
       var template = `<div class="item che">
-                              <p class="ques_title">${data.TTitle}</p>`;
+                              <p class="ques_title">${data.TTitle}</p>
+                              `;
       var option = data.Option;
       var sub = '';
       for (var i = 0; i < option.length; i++) {
         sub += renderSubChe(option[i], data.PK_TID, isRequired, data.OType);
       }
+
       $form.append(template + sub + '</div>')
     }
 
@@ -155,21 +157,35 @@ console.log(res)
       var template = `<div class="item grade clear" TTitle="${data.TTitle}">
                       <p class="ques_title">${data.TTitle}</p>`;
       var option = data.Option;
+      var scoreRange = data.ScoreRange;
       var sub = '';
       for (var i = 0; i < option.length; i++) {
-        sub += renderSubGra(option[i], data.PK_TID, isRequired, i);
+        sub += renderSubGra(option[i], data.PK_TID, isRequired, i, scoreRange);
       }
-      $form.append(template + sub + '</div>')
+      var duffix = `<div class="satisfaction clear">
+                      <div class="satisfaction_text text_left fl">${data.LeftText}</div>
+                      <div class="satisfaction_text text_middle fl">${data.MiddleText}</div>
+                      <div class="satisfaction_text text_right fl">${data.RightText}</div>
+                     </div>`
+      $form.append(template + sub + duffix + '</div>')
     }
 
-    function renderSubGra(data, PK_TID, isRequired, index) {
+    function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
       var pre = `<div class="grade_item">
-                <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input clear">`;
+                <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input wrap_grade clear">`;
       var temp = '';
+
       for (var i = 0; i < 10; i++) {
         temp += `<div PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
       }
-      return pre + temp + '</div></div>';
+
+      var grageNumber = '';
+      for(var i = 0; i < scoreRange.length; i++) {
+        grageNumber += `<div class="wrap_grade_item fl">
+                             <div class="grade_item_number"></div>
+                        </div>`
+      }
+      return pre + grageNumber + '</div></div>';
     }
   }
 
