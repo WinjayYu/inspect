@@ -15,8 +15,8 @@
 </head>
 <body>
 <div class="container">
+  <p class="q_title"></p>
   <div class="header">
-    <p class="q_name"></p>
     <p class="call"></p>
   </div>
   <div class="content">
@@ -55,8 +55,9 @@
       data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
         if (res.ErrCode === 200) {
+console.log(res)
           ajaxData = res.Data;
-          $('.q_name').text(res.Data.QName);
+          $('.q_title').text(res.Data.QName);
           $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
           var top = res.Data.Topic;
           var target = res.Data.Target;
@@ -187,7 +188,7 @@
   }
 
   $( "#form_data").submit(function( event ) {
-    var res = {Result: []};
+    var req = {Result: []};
 
     // 判断是否评分
     $('.grade').find('.grade_item').each( function(i, v){
@@ -200,7 +201,7 @@
     $('input[type="radio"][name!="target"]:checked').each(function (index, value) {
       var type = $(value).attr('type');
       if(type = 'redio') {
-        res.Result.push(radioData($(value)));
+        req.Result.push(radioData($(value)));
       }
     });
 
@@ -209,7 +210,7 @@
       checkboxNames.push($(value).attr('name'));
     });
     checkboxNames = Array.from(new Set(checkboxNames));
-    console.log(checkboxNames);
+//    console.log(checkboxNames);
 
     for(var i=0; i<checkboxNames.length; i++) {
       var temp = {SelectedOption: []}
@@ -218,25 +219,26 @@
         temp.PK_TID = $(value).attr('PK_TID');
         temp.SelectedOption.push(checkboxData($(value)));
       });
-      res.Result.push(temp);
+      req.Result.push(temp);
     }
-    console.log(res);
 
-    var gradeData = {SelectedOption: []}
+    // 评分统计
+    var gradeData = {SelectedOption: []};
     $('.grade_item').each(function (i, v) {
-      console.log($(v).find('.wrap_input .selected').text());
+      console.log($(v).find('.selected').text());
+      var $selected = $(v).find('.selected');
       gradeData.OType = 3;
-      gradeData.PK_TID = $(v).attr('PK_TID');
-      gradeData.SelectedOption.push({"OptionScoreValue": $(v).find('.wrap_input .selected').text()});
-      gradeData.SelectedOption.push({"PK_TID": $(v).find('.wrap_input  .selected').attr('PK_TID')});
+      gradeData.PK_TID = $selected.attr('PK_TID');
+      gradeData.SelectedOption.push({"OptionScoreValue": $selected.text()});
+
+      gradeData = {SelectedOption: []}
+      req.Result.push(gradeData);
     })
 
-    res.Result.push(gradeData);
+    req.PK_QID = ajaxData.PK_QID;
+    req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
-    res.PK_QID = ajaxData.PK_QID;
-    res.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
-
-    postAjax(res);
+    postAjax(req);
 
     event.preventDefault();
   });
@@ -258,7 +260,6 @@
   }
 
   function postAjax(data) {
-    console.log('000', JSON.stringify(data));
     $.ajax({
       url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
       type: "POST",

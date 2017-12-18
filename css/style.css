@@ -1,5 +1,7 @@
 .container {
   background-color: #f4f5f7;
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 .container .header {
@@ -7,10 +9,13 @@
   background-color: #fff;
 }
 
-.container .header .q_name {
-  color: #4d526c;
-  font-size: 20px;
+.container  .q_title {
+  color: #fff;
+  font-size: 21px;
   font-weight: bold;
+  background-color: #53a4f4;
+  padding: 10px 10px;
+  text-align: center;
 }
 
 .container .header .call {
