@@ -29,6 +29,7 @@
   </div>
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="./javascripts/utils.js"></script>
 <script>
   var ajaxData;
   var Auth, PK_QID;
@@ -55,7 +56,6 @@
       data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
         if (res.ErrCode === 200) {
-console.log(res)
           ajaxData = res.Data;
           $('.q_title').text(res.Data.QName);
           $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
@@ -268,8 +268,8 @@ console.log(res)
     req.PK_QID = ajaxData.PK_QID;
     req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
-    postAjax(req);
 
+    postAjax(req);
     event.preventDefault();
   });
 
@@ -302,7 +302,12 @@ console.log(res)
       success: function (res) {
         if(res.ErrCode === 200) {
           alert('提交成功');
-          android.showToast(JSON.stringify(res));
+          var type = iosOrAndroid();
+          if(type === 'iOS') {
+            ios.showToast(JSON.stringify(res));
+          } else if(type === 'Android') {
+            android.showToast(JSON.stringify(res));
+          }
         } else {
           alert(res.ErrMsg);
         }
