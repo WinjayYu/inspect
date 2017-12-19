@@ -173,31 +173,42 @@ console.log(res)
     function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
       var pre = `<div class="grade_item">
                 <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input wrap_grade clear">`;
-      var temp = '';
-
-      for (var i = 0; i < 10; i++) {
-        temp += `<div PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
-      }
+//      var temp = '';
+//
+//      for (var i = 0; i < 10; i++) {
+//        temp += `<div PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
+//      }
 
       var grageNumber = '';
       for(var i = 0; i < scoreRange.length; i++) {
-        grageNumber += `<div class="wrap_grade_item fl">
-                             <div class="grade_item_number"></div>
-                        </div>`
+        grageNumber += `<div PK_TID="${PK_TID}" class="grade_item_number fl"></div>`
       }
       return pre + grageNumber + '</div></div>';
     }
   }
 
 
-  function getGrade(index) {
-   $('body').on('click', '.grade_number', function (v) {
-     $(this).siblings().removeClass('selected');
-     $(this).addClass('selected')
-   })
+  function listenGrade() {
+   $('body').on('click', '.grade_item_number', function (e) {
 
+     $(this).siblings().removeClass('grade_item_active');
+
+     $(this).addClass('grade_item_active');
+     $(this).prevAll().addClass('grade_item_active');
+   })
   }
-  getGrade();
+
+  listenGrade();
+
+//  // 打分监听
+//  function getGrade(index) {
+//   $('body').on('click', '.grade_number', function (v) {
+//     $(this).siblings().removeClass('selected');
+//     $(this).addClass('selected')
+//   })
+//
+//  }
+//  getGrade();
   
   function handleSubmit() {
     return false;
@@ -206,14 +217,15 @@ console.log(res)
   $( "#form_data").submit(function( event ) {
     var req = {Result: []};
 
-    // 判断是否评分
-    $('.grade').find('.grade_item').each( function(i, v){
-      if(!$(this).find('div').hasClass('selected')) {
-        alert('请评分！');
-        return;
-      }
-    })
+//    // 判断是否评分
+//    $('.grade').find('.grade_item').each( function(i, v){
+//      if(!$(this).find('div').hasClass('selected')) {
+//        alert('请评分！');
+//        return;
+//      }
+//    })
 
+    // 单选检查
     $('input[type="radio"][name!="target"]:checked').each(function (index, value) {
       var type = $(value).attr('type');
       if(type = 'redio') {
@@ -221,6 +233,7 @@ console.log(res)
       }
     });
 
+    // 多选检查
     var checkboxNames = [];
     $('input[type="checkbox"]:checked').each(function (index, value) {
       checkboxNames.push($(value).attr('name'));
@@ -241,14 +254,15 @@ console.log(res)
     // 评分统计
     var gradeData = {SelectedOption: []};
     $('.grade_item').each(function (i, v) {
-      console.log($(v).find('.selected').text());
-      var $selected = $(v).find('.selected');
-      gradeData.OType = 3;
-      gradeData.PK_TID = $selected.attr('PK_TID');
-      gradeData.SelectedOption.push({"OptionScoreValue": $selected.text()});
+      var $gradeActive = $(v).find('.grade_item_active');
+      if($gradeActive.length) {
+        gradeData.OType = 3;
+        gradeData.PK_TID = $gradeActive.eq(0).attr('PK_TID');
+        gradeData.SelectedOption.push({"OptionScoreValue": $gradeActive.length});
 
-      gradeData = {SelectedOption: []}
-      req.Result.push(gradeData);
+        req.Result.push(gradeData);
+        gradeData = {SelectedOption: []}
+      }
     })
 
     req.PK_QID = ajaxData.PK_QID;
