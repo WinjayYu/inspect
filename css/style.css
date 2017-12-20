@@ -161,3 +161,48 @@ input[type="checkbox"] {
   background-size: 46%;
 
 }
+
+.statis .header {
+  padding: 10px 15px 15px;
+}
+
+.statis .header .type {
+  display: inline-block;
+  padding: 0 5px;
+  background-color: #53a4f4;
+  border-radius: 2px;
+  color: #fff;
+  margin: 10px 0;
+}
+
+.statis .header .header_des {
+  color: #746f6f;
+}
+
+.statis .echarts {
+  height: 260px;
+  padding: 10px 0;
+}
+
+.statis .row {
+  background-color: #fff;
+  padding: 10px 15px 0;
+  margin-top: 20px;
+}
+
+.statis  .appendix {
+  background-color: #fff;
+  margin: 20px 15px -20px;
+}
+
+.statis .header .title_text{
+  font-size: 19px;
+}
+
+.statis .header .header_bottom {
+  margin-top: 10px;
+}
+
+.statis .header .org_text:first-child {
+  font-weight: bold;
+}
