@@ -12,17 +12,369 @@
   <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
-  <div class="container">
-      <div class="statis_header">
-        <p class="title">内蒙古自治区</p>
-        <div class="type">教育行业</div>
-        <p class="header_des">2014年，索尼影业在发行一部以“刺杀金正恩”为主题的虚构故事电影后，遭受黑客攻击的，华府亦指控是朝鲜所为。受攻击后，索尼的电影、企业财务资料及机密内部电邮在网上曝光。当时面对华府的指控，朝鲜向时任美国总统奥巴马反击。但针对WannaCry的指控，朝鲜至今未有回应。今年十月，朝鲜指，英国官员指称该国策动WannaCry攻击是“毫无根据的揣测”，有加强制裁该国的“恶意企图”。</p>
-        <p class="org_name">内蒙古自治区产品质量研究院</p>
-
+  <div class="container statis">
+    <div class="header">
+      <p class="title_text">内蒙古自治区服务质量调查报告</p>
+      <div class="type">教育行业</div>
+      <p class="header_des">
+        为贯彻落实党的十九大精神，深化内蒙古自治区供给侧结构性改革，推动传统产业优化升级，加快发展现代服务业，瞄准国际标准提高水平，内蒙古质检院以服务质量监测为抓手，定量分析研究全区服务业质量状况。此报告为义务教育行业专项报告，数据显示，全区居民对义务教育服务质量的满意度为71.8，处于“基本满意”的水平。</p>
+      <div class="header_bottom">
+        <p class="org_text">内蒙古自治区产品质量研究院</p>
+        <p class="org_text">组织执行：思睿致远信息咨询(北京)有限公司</p>
+        <p class="org_text">释疑、资讯电话 18910186639</p>
+        <p class="org_text">254343468@qq.com</p>
       </div>
+    </div>
+    <div id="content">
 
+    </div>
   </div>
 
-<script src="https://cdn.bootcss.com/jsrender/1.0.0-rc.70/jsrender.min.js"></script>
+  <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+  <script src="https://cdn.bootcss.com/jsrender/1.0.0-rc.70/jsrender.min.js"></script>
+  <script src="http://apps.bdimg.com/libs/echarts/2.1.9/source/echarts-all.js"></script>
+  <script src="http://apps.bdimg.com/libs/shine.js/0.2.7/shine.min.js"></script>
+  <script type="text/javascript">
+      $(function () {
+        GetStatisticsSubmitNumber(function () {
+          //获取具体
+          GetStatisticsResult(function () {
+            //获取附录
+            $("#content").append("<div class='appendix'><h1>二、调查报告附录</h1></div> ");
+            GetReportAppendix();
+          });
+        });
+      });
+    function GetStatisticsSubmitNumber(callback) {
+      $.ajax({
+        url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetStatisticsSubmitNumber",
+        type: "POST",
+        data: JSON.stringify({PK_QID: "201712171716007820000000000000000736"}),
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          var list = [];
+          for (var i = 0; i < data.Data.length; i++) {
+            list.push({ name: data.Data[i].EName, value: [data.Data[i].Count] });
+          }
+          if (data.ErrCode == 200) {
+            var Data = {
+              title: "1、各区采集问卷数量统计",
+              type: "line",
+              isarea: false,//是否显示区域
+              boundaryGap: false,//是否紧挨着边界
+              diagram: ["采集人数"],
+              labelformatter: "{c}人",
+              unit: "人",
+              data: list
+            };
+            Creation($("#content")[0], Data);
+            if (callback) {
+              setTimeout(callback(), 1000);
+            }
+          } else {
+          }
+        }
+      });
+    }
+    function GetStatisticsResult(callback) {
+      $.ajax({
+        url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetStatisticsResult",
+        type: "POST",
+        data: JSON.stringify({ PK_QID: "201712171716007820000000000000000736" }),
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+          if (data.ErrCode == 200) {
+            BatchCreationDispose(data.Data);
+            if (callback) {
+              setTimeout(callback(), 1000);
+            }
+          } else {
+
+          }
+        }
+      });
+    }
+    //获取阶段分布
+    function GetReportAppendix() {
+      $.ajax({
+        url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetReportAppendix",
+        type: "POST",
+        data: JSON.stringify({ PK_QID: "201712171716007820000000000000000736" }),
+        dataType: "json",
+        contentType: "application/json",
+        success: function (data) {
+//          top.window.layer.close(index);
+          if (data.ErrCode == 200) {
+            CreationPic($("#content")[0], {
+              title: "1、受访者性别比例",
+              type: "pie",
+              isarea: false,//是否显示区域
+              boundaryGap: false,//是否紧挨着边界
+              diagram: data.Data.SexListModel.map(function (item) { return item.Name;}),
+              labelformatter: "{c}人",
+              unit: "人",
+              data: data.Data.SexListModel.map(function (item) { return { name: item.Name, value: [item.Count] }; })
+            });
+            CreationPic($("#content")[0], {
+              title: "2、受访者年龄段结构",
+              type: "pie",
+              isarea: false,//是否显示区域
+              boundaryGap: false,//是否紧挨着边界
+              diagram: data.Data.AgeListModel.map(function (item) { return item.Name; }),
+              labelformatter: "{c}人",
+              unit: "人",
+              data: data.Data.AgeListModel.map(function (item) { return { name: item.Name, value: [item.Count] }; })
+            });
+          } else {
+          }
+        }
+      });
+    }
+    //创建饼状
+    function CreationPic(ContentElement, Data) {
+      var template = $('<div class="row"><div class="ibox float-e-margins"><p class="chart_title">' + Data.title + '</p><div class="echarts"></div></div></div>');
+      var elem = template.find(".echarts")[0];
+      $(ContentElement).append(template);
+      var Cartogram = echarts.init(elem, "shine");
+      var option = {
+        title: {
+         show: false
+        },
+        legend: {
+          orient: 'horizontal',
+          padding: 5,
+          data: Data.diagram
+        },
+        tooltip: {
+          trigger: 'item',
+          formatter: "{a} <br/>{b} : {c} ({d}%)"
+        },
+        calculable: true,
+        series: [{
+          name: "名字",
+          type: Data.type,
+          radius: '50%',
+          center: ['50%', '60%'],
+          data: Data.data.map(function (item) { return { name: item.name, value: item.value[0] }; })
+
+        }]
+      };
+      Cartogram.setOption(option);
+      $(window).resize(Cartogram.resize);
+    }
+    //创建
+    function Creation(ContentElement, Data) {
+      var template = $('<div class="row"><div class="ibox float-e-margins"><p class="chart-title"></p><div class="ibox-content"><div class="echarts"></div></div></div></div>');
+      var elem = template.find(".echarts")[0];
+      var chartTitle= template.find(".chart-title")[0];
+      $(chartTitle).text(Data.title)
+      $(ContentElement).append(template);
+      var Cartogram = echarts.init(elem, "shine");
+      var series = [];
+      if (Data.isarea) {
+        for (var i = 0; i < Data.diagram.length; i++) {
+          series.push({
+            name: Data.diagram[i],
+            type: Data.type,
+            areaStyle: { normal: {} },//如果需要区域就加这一句
+            data: Data.data.map(function (item) { return item.value[i]; }),
+            label: {
+              normal: {
+                show: true,
+                position: 'top',
+                formatter: Data.labelformatter
+              }
+            }
+          });
+        }
+      } else {
+        for (var i = 0; i < Data.diagram.length; i++) {
+          series.push({
+            name: Data.diagram[i],
+            type: Data.type,
+            data: Data.data.map(function (item) { return item.value[i]; }),
+            label: {
+              normal: {
+                show: true,
+                position: 'top',
+                formatter: Data.labelformatter
+              }
+            }
+          });
+        }
+      }
+      var option = {
+        title: {
+          show: false
+        },
+        legend: {
+          y:22,
+          data: Data.diagram
+        },
+        tooltip: {
+          trigger: 'axis'
+        },
+        grid: {
+          x: 40,
+          x2: 40,
+          y2: 24
+        },
+        calculable: true,
+        xAxis: [
+          {
+            type: 'category',
+            boundaryGap: Data.boundaryGap,
+            data: Data.data.map(function (item) { return item.name; })
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value',
+            axisLabel: {
+              formatter: '{value}' + Data.unit
+            }
+          }
+        ],
+        series: series
+      };
+      Cartogram.setOption(option);
+      $(window).resize(Cartogram.resize);
+    }
+    //处理创建具体的题目统计信息
+    function BatchCreationDispose(ListData) {
+      var ItemIndex = 2;
+      for (var i = 0; i < ListData.Topic.length; i++) {
+        var ItemTopic = ListData.Topic[i];
+        if (ItemTopic.OType == 0 || ItemTopic.OType == 1) {
+          //柱形图
+          var Data = {
+            title: ItemIndex + "、" + ItemTopic.TTitle,
+            type: "bar",
+            isarea: false,//是否显示区域
+            boundaryGap: true,//是否紧挨着边界
+            diagram: [],
+            labelformatter: "{c}人",
+            unit: "人",
+            data: []
+          };
+          //处理data数据
+          for (var o = 0; o < ItemTopic.Option.length; o++) {
+            //数据的项目
+            Data.diagram.push(ItemTopic.Option[o].TTitle);
+          }
+          //题目的ID
+          var PK_TID = ItemTopic.PK_TID;
+          for (var e = 0; e < ListData.Target.length; e++) {
+            //获取该对象的具体值
+            var PK_EID = ListData.Target[e].PK_EID;
+            //读取值
+            var name = ListData.Target[e].EName;
+            var value = [];
+            for (var o = 0; o < ItemTopic.Option.length; o++) {
+              //选项的ID
+              var PK_OID = ItemTopic.Option[o].PK_OID;
+              var SelectCount = 0;
+              for (var v = 0; v < ListData.UserResult.length; v++) {
+                if (ListData.UserResult[v].PK_EID == PK_EID && ListData.UserResult[v].PK_TID == PK_TID && ListData.UserResult[v].PK_OID == PK_OID) {
+                  //选中了
+                  SelectCount = SelectCount + 1;
+                }
+              }
+              value.push(SelectCount);
+            }
+            Data.data.push({ name: name, value: value });
+          }
+          Creation($("#content")[0], Data);
+          ItemIndex++;
+        } else if (ItemTopic.OType == 3) {
+          //打分
+          var Data = {
+            title: ItemIndex + "、" + ItemTopic.TTitle,
+            type: "line",
+            isarea: true,//是否显示区域
+            boundaryGap: false,//是否紧挨着边界
+            diagram: [],
+            labelformatter: "{c}分",
+            unit: "分",
+            data: []
+          };
+          //处理data数据
+          for (var o = 0; o < ItemTopic.Option.length; o++) {
+            //数据的项目
+            Data.diagram.push(ItemTopic.Option[o].TTitle);
+          }
+          //题目的ID
+          var PK_TID = ItemTopic.PK_TID;
+          for (var e = 0; e < ListData.Target.length; e++) {
+            //获取该对象的具体值
+            var PK_EID = ListData.Target[e].PK_EID;
+            //读取值
+            var name = ListData.Target[e].EName;
+            var value = [];
+            for (var o = 0; o < ItemTopic.Option.length; o++) {
+              //选项的ID
+              var PK_OID = ItemTopic.Option[o].PK_OID;
+              var score = 0;
+              for (var v = 0; v < ListData.UserResult.length; v++) {
+                if (ListData.UserResult[v].PK_EID == PK_EID && ListData.UserResult[v].PK_TID == PK_TID && ListData.UserResult[v].PK_OID == PK_OID) {
+                  //选中了
+                  var ItemValue = parseInt(ListData.UserResult[v].ScoreValue);
+                  if (isNaN(ItemValue)) {
+                    ItemValue = 0;
+                  }
+                  score = score + ItemValue;
+                }
+              }
+              value.push(score);
+            }
+            Data.data.push({ name: name, value: value });
+          }
+          Creation($("#content")[0], Data);
+          ItemIndex++;
+        } else if (ItemTopic.OType == 7) {
+          //NPS
+          //折线图
+          var Data = {
+            title: ItemIndex + "、" + ItemTopic.TTitle,
+            type: "line",
+            isarea: true,//是否显示区域
+            boundaryGap: false,//是否紧挨着边界
+            diagram: ["分值"],
+            labelformatter: "{c}分",
+            unit: "分",
+            data: []
+          };
+          //题目的ID
+          var PK_TID = ItemTopic.PK_TID;
+          for (var e = 0; e < ListData.Target.length; e++) {
+            //获取该对象的具体值
+            var PK_EID = ListData.Target[e].PK_EID;
+            //读取值
+            var name = ListData.Target[e].EName;
+            var value = [];
+            var score = 0;
+            for (var v = 0; v < ListData.UserResult.length; v++) {
+              if (ListData.UserResult[v].PK_EID == PK_EID && ListData.UserResult[v].PK_TID == PK_TID) {
+                //选中了
+                var ItemValue = parseInt(ListData.UserResult[v].ScoreValue);
+                if (isNaN(ItemValue)) {
+                  ItemValue = 0;
+                }
+                score = score + ItemValue;
+              }
+            }
+            value = [score];
+            Data.data.push({ name: name, value: value });
+          }
+          //处理数据
+          Creation($("#content")[0], Data);
+          ItemIndex++;
+        }
+
+      }
+    }
+  </script>
 </body>
 </html>
