@@ -30,6 +30,8 @@
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="./javascripts/utils.js"></script>
+<script src="./javascripts/jquery.ui.widget.js"></script>
+<script src="./javascripts/jquery.fileupload.js"></script>
 <script>
   var ajaxData;
   var Auth, PK_QID;
@@ -55,6 +57,7 @@
       contentType: "application/json",
       data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
+console.log(res);
         if (res.ErrCode === 200) {
           ajaxData = res.Data;
           $('.q_title').text(res.Data.QName);
@@ -77,6 +80,9 @@
             }
             if (top[i].OType === 3) {
               renderGrade(top[i]);
+            }
+            if (top[i].OType === 5) {
+              renderFileUpload(top[i]);
             }
           }
           $form.append('<div id="submit" class="form_submit"><input type="submit" value="提交"></div>');
@@ -173,17 +179,21 @@
     function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
       var pre = `<div class="grade_item">
                 <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input wrap_grade clear">`;
-//      var temp = '';
-//
-//      for (var i = 0; i < 10; i++) {
-//        temp += `<div PK_TID="${PK_TID}" class="grade_number">${i + 1}</div>`;
-//      }
 
       var grageNumber = '';
       for(var i = 0; i < scoreRange.length; i++) {
         grageNumber += `<div PK_TID="${PK_TID}" class="grade_item_number fl"></div>`
       }
       return pre + grageNumber + '</div></div>';
+    }
+
+    function renderFileUpload(data) {
+      var isRequired = data.IsRequired === 0 ? '' : 'required';
+      var template = `<div class="item file_upload clear" TTitle="${data.TTitle}">
+                      <p class="ques_title">${data.TTitle}</p>
+                      <input type="file" id="fileupload"  name="file" data-url="http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/UploadFile" multiple>
+                      </div>`;
+      $form.append(template)
     }
   }
 
@@ -197,7 +207,6 @@
      $(this).prevAll().addClass('grade_item_active');
    })
   }
-
   listenGrade();
 
 //  // 打分监听
@@ -213,6 +222,20 @@
   function handleSubmit() {
     return false;
   }
+
+  $(function () {
+    $("#fileupload").fileupload({
+      dataType: 'json',
+      done: function (e, data) {
+        if(data.result.ErrCode === 200) {
+          alert("上传成功！");
+          $('#fileupload').hide();
+          $('<img class="uploaded_img" />').attr('src', data.result.Data[0]).appendTo('.file_upload');
+        }
+        console.log(e, data);
+      }
+    });
+  })
 
   $( "#form_data").submit(function( event ) {
     var req = {Result: []};
