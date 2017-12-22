@@ -162,6 +162,14 @@ input[type="checkbox"] {
 
 }
 
+.container .uploaded_img {
+  width: 80px;
+  margin-left: 10px;
+}
+.container .img_wrap {
+  padding: 10px 15px;
+}
+
 .statis .header {
   padding: 10px 15px 15px;
 }
@@ -207,15 +215,53 @@ input[type="checkbox"] {
   font-weight: bold;
 }
 
-.container input[type="file"] {
-  background-color: #53a4f4;
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
   display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
+}
+
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
   cursor: pointer;
 }
+
+.glyphicon:before {
+  content: "\2b";
+  font-size: 40px;
+}
+
+.glyphicon {
+  position: relative;
+  top: 1px;
+  display: inline-block;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin-bottom: 5px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 15px 15px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border: 1px #eee dashed;
+  border-radius: 4px;
+  color: #4d526c;
+  background-color: rgba(192,192,192,0.3);
+}
+

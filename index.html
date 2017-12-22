@@ -1,32 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="content-type" content='text/html;charset=utf-8'/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-  <meta name="format-detection" content="telephone=no,address=no"/>
-  <title>问卷调查</title>
-  <link rel="stylesheet" href="./css/reset.css">
-  <link rel="stylesheet" href="./css/style.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content='text/html;charset=utf-8'/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+    <meta name="format-detection" content="telephone=no,address=no"/>
+    <title>问卷调查</title>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/style.css">
 
-  <link href="https://cdn.bootcss.com/jquery-bar-rating/1.2.2/themes/bars-horizontal.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/jquery-bar-rating/1.2.2/themes/bars-horizontal.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-  <p class="q_title"></p>
-  <div class="header">
-    <p class="call"></p>
-  </div>
-  <div class="content">
-    <form id="form_data" method="post" onsubmit="handleSubmit()">
-      <div class="target">
-        <p class="target_name">评价对象</p>
-      </div>
+    <p class="q_title"></p>
+    <div class="header">
+        <p class="call"></p>
+    </div>
+    <div class="content">
+        <form id="form_data" method="post" onsubmit="handleSubmit()">
+            <div class="target">
 
-    </form>
-  </div>
+            </div>
+
+        </form>
+    </div>
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="./javascripts/utils.js"></script>
@@ -37,7 +37,7 @@
   var Auth, PK_QID;
 
   function loadAuth(au, pk) {
-    if(au && pk) {
+    if (au && pk) {
       Auth = au;
       PK_QID = pk;
       renderPage();
@@ -47,7 +47,7 @@
   function renderPage() {
     var $form = $('form');
     var $target = $('.target');
-    $('#submit').click(function(e){
+    $('#submit').click(function (e) {
       e.preventDefault();
     });
     $.ajax({
@@ -57,14 +57,15 @@
       contentType: "application/json",
       data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
-console.log(res);
+        console.log(res);
         if (res.ErrCode === 200) {
           ajaxData = res.Data;
           $('.q_title').text(res.Data.QName);
           $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'))
           var top = res.Data.Topic;
           var target = res.Data.Target;
-          for(var j = 0; j < target.length; j++) {
+          $target.append('<p class="target_name">评价对象</p>');
+          for (var j = 0; j < target.length; j++) {
             renderTarget(target[j], true);
           }
 
@@ -121,7 +122,7 @@ console.log(res);
       for (var i = 0; i < option.length; i++) {
         sub += renderSubRad(option[i], data.PK_TID, isRequired, data.OType)
       }
-        $form.append(template + sub + '</div>');
+      $form.append(template + sub + '</div>');
     }
 
     // 单选子选项
@@ -173,7 +174,8 @@ console.log(res);
                       <div class="satisfaction_text text_middle fl">${data.MiddleText}</div>
                       <div class="satisfaction_text text_right fl">${data.RightText}</div>
                      </div>`
-      $form.append(template + sub + duffix + '</div>')
+      $form.append(template + sub + duffix + '</div>');
+      adjustThumbWidth(scoreRange);
     }
 
     function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
@@ -181,7 +183,7 @@ console.log(res);
                 <p class="ques_sub_title">${data.TTitle}</p><div class="wrap_input wrap_grade clear">`;
 
       var grageNumber = '';
-      for(var i = 0; i < scoreRange.length; i++) {
+      for (var i = 0; i < scoreRange.length; i++) {
         grageNumber += `<div PK_TID="${PK_TID}" class="grade_item_number fl"></div>`
       }
       return pre + grageNumber + '</div></div>';
@@ -189,55 +191,57 @@ console.log(res);
 
     function renderFileUpload(data) {
       var isRequired = data.IsRequired === 0 ? '' : 'required';
-      var template = `<div class="item file_upload clear" TTitle="${data.TTitle}">
-                      <p class="ques_title">${data.TTitle}</p>
-                      <input type="file" id="fileupload"  name="file" data-url="http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/UploadFile" multiple>
+      var template = `<div class="item file_upload clear" PK_TID="${data.PK_TID}">
+                        <p class="ques_title">${data.TTitle}</p>
+                        <div class="img_wrap clear ">
+                          <span class="btn btn-success fileinput-button fl">
+                          <i class="glyphicon"></i>
+                          <span></span>
+                              <input type="file" id="fileupload"  name="file[]" data-url="http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/UploadFile" multiple>
+                          </span>
+                        </div>
                       </div>`;
       $form.append(template)
+      listenUpload();
     }
   }
 
+  // 调整拇指宽度
+  function adjustThumbWidth(scoreRange) {
+    var width = 100 / ( scoreRange.length );
+    $('.grade_item_number').css('width', width + '%');
+  }
 
+
+  // 监听打分
   function listenGrade() {
-   $('body').on('click', '.grade_item_number', function (e) {
+    $('body').on('click', '.grade_item_number', function (e) {
 
-     $(this).siblings().removeClass('grade_item_active');
+      $(this).siblings().removeClass('grade_item_active');
 
-     $(this).addClass('grade_item_active');
-     $(this).prevAll().addClass('grade_item_active');
-   })
+      $(this).addClass('grade_item_active');
+      $(this).prevAll().addClass('grade_item_active');
+    })
   }
   listenGrade();
 
-//  // 打分监听
-//  function getGrade(index) {
-//   $('body').on('click', '.grade_number', function (v) {
-//     $(this).siblings().removeClass('selected');
-//     $(this).addClass('selected')
-//   })
-//
-//  }
-//  getGrade();
-  
   function handleSubmit() {
     return false;
   }
 
-  $(function () {
+  function listenUpload() {
     $("#fileupload").fileupload({
       dataType: 'json',
       done: function (e, data) {
-        if(data.result.ErrCode === 200) {
+        if (data.result.ErrCode === 200) {
           alert("上传成功！");
-          $('#fileupload').hide();
-          $('<img class="uploaded_img" />').attr('src', data.result.Data[0]).appendTo('.file_upload');
+          $('<img class="uploaded_img fl" />').attr('src', data.result.Data[0]).appendTo('.img_wrap');
         }
-        console.log(e, data);
       }
     });
-  })
+  }
 
-  $( "#form_data").submit(function( event ) {
+  $("#form_data").submit(function (event) {
     var req = {Result: []};
 
 //    // 判断是否评分
@@ -251,7 +255,7 @@ console.log(res);
     // 单选检查
     $('input[type="radio"][name!="target"]:checked').each(function (index, value) {
       var type = $(value).attr('type');
-      if(type = 'redio') {
+      if (type = 'redio') {
         req.Result.push(radioData($(value)));
       }
     });
@@ -264,7 +268,7 @@ console.log(res);
     checkboxNames = Array.from(new Set(checkboxNames));
 //    console.log(checkboxNames);
 
-    for(var i=0; i<checkboxNames.length; i++) {
+    for (var i = 0; i < checkboxNames.length; i++) {
       var temp = {SelectedOption: []}
       $('input[name=' + checkboxNames[i] + ']:checked').each(function (index, value) {
         temp.OType = $(value).attr('OType');
@@ -278,7 +282,7 @@ console.log(res);
     var gradeData = {SelectedOption: []};
     $('.grade_item').each(function (i, v) {
       var $gradeActive = $(v).find('.grade_item_active');
-      if($gradeActive.length) {
+      if ($gradeActive.length) {
         gradeData.OType = 3;
         gradeData.PK_TID = $gradeActive.eq(0).attr('PK_TID');
         gradeData.SelectedOption.push({"OptionScoreValue": $gradeActive.length});
@@ -288,13 +292,26 @@ console.log(res);
       }
     })
 
+    // 图片统计
+    var fileData = {UploadValue: []};
+    $(".file_upload").each(function (i, v) {
+      fileData.OType = 5;
+      fileData.PK_TID = $(this).attr('PK_TID');
+      var $imgArr = $(v).find('img');
+      $imgArr.each(function(idx, value){
+        fileData.UploadValue.push($(value).attr('src'));
+      })
+      req.Result.push(fileData);
+      fileData = {UploadValue: []};
+    })
+
     req.PK_QID = ajaxData.PK_QID;
     req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
-
-    postAjax(req);
+console.log(req);
+//    postAjax(req);  // 发送ajax请求
     event.preventDefault();
-  });
+  });  // end submit
 
   // 单选数据处理
   function radioData(data) {
@@ -314,30 +331,30 @@ console.log(res);
 
   function postAjax(data) {
     $.ajax({
-      url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
-      type: "POST",
-      headers: {
-        'Auth': Auth
-      },
-      dataType: "json",
-      contentType: "application/json",
-      data: JSON.stringify(data),
-      success: function (res) {
-        if(res.ErrCode === 200) {
-          alert('提交成功');
-          var type = iosOrAndroid();
-          if(type === 'iOS') {
-            ios.showToast(JSON.stringify(res));
-          } else if(type === 'Android') {
-            android.showToast(JSON.stringify(res));
+        url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
+        type: "POST",
+        headers: {
+          'Auth': Auth
+        },
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (res) {
+          if (res.ErrCode === 200) {
+            alert('提交成功');
+            var type = iosOrAndroid();
+            if (type === 'iOS') {
+              ios.showToast(JSON.stringify(res));
+            } else if (type === 'Android') {
+              android.showToast(JSON.stringify(res));
+            }
+          } else {
+            alert(res.ErrMsg);
           }
-        } else {
-          alert(res.ErrMsg);
+        },
+        error: function (res) {
+          alert('提交失败')
         }
-      },
-      error: function (res) {
-        alert('提交失败')
-      }
       }
     )
   }
