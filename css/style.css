@@ -265,3 +265,48 @@ input[type="checkbox"] {
   background-color: rgba(192,192,192,0.3);
 }
 
+.download {
+  background-color: #fff;
+}
+
+.download .icon_group {
+  padding-top: 170px;
+  text-align: center;
+}
+
+.download .icon_group .icon {
+  width: 80px;
+}
+
+.download .download_btn {
+  font-size: 16px;
+  line-height: 36px;
+  border-radius: 20px;
+  border: 1px #eee solid;
+  text-align: center;
+  width: 150px;
+  margin: 50px auto 0;
+  padding: 0 20px;
+}
+
+.download .download_btn .platform_logo {
+  width: 30px;
+  height: 30px;
+  background: url("../images/android-128.png") no-repeat center;
+  background-size: 25px 30px;
+  display: inline-block;
+  vertical-align: -8px;
+}
+
+.download .copyright {
+  text-align: center;
+  opacity: .6;
+  margin-top: 70px;
+}
+
+.download a {
+  color: #000;
+}
+
+
+

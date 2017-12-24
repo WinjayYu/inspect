@@ -1,32 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="content-type" content='text/html;charset=utf-8'/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
-    <meta name="format-detection" content="telephone=no,address=no"/>
-    <title>问卷调查</title>
-    <link rel="stylesheet" href="./css/reset.css">
-    <link rel="stylesheet" href="./css/style.css">
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" content='text/html;charset=utf-8'/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+  <meta name="format-detection" content="telephone=no,address=no"/>
+  <title>问卷调查</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/style.css">
 
-    <link href="https://cdn.bootcss.com/jquery-bar-rating/1.2.2/themes/bars-horizontal.css" rel="stylesheet">
+  <link href="https://cdn.bootcss.com/jquery-bar-rating/1.2.2/themes/bars-horizontal.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-    <p class="q_title"></p>
-    <div class="header">
-        <p class="call"></p>
-    </div>
-    <div class="content">
-        <form id="form_data" method="post" onsubmit="handleSubmit()">
-            <div class="target">
+  <p class="q_title"></p>
+  <div class="header">
+    <p class="call"></p>
+  </div>
+  <div class="content">
+    <form id="form_data" method="post" onsubmit="handleSubmit()">
+      <div class="target">
 
-            </div>
+      </div>
 
-        </form>
-    </div>
+    </form>
+  </div>
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="./javascripts/utils.js"></script>
@@ -175,7 +175,7 @@
                       <div class="satisfaction_text text_right fl">${data.RightText}</div>
                      </div>`
       $form.append(template + sub + duffix + '</div>');
-      adjustThumbWidth(scoreRange);
+      adjustThumbWidth(scoreRange, data.PK_TID);
     }
 
     function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
@@ -184,7 +184,7 @@
 
       var grageNumber = '';
       for (var i = 0; i < scoreRange.length; i++) {
-        grageNumber += `<div PK_TID="${PK_TID}" class="grade_item_number fl"></div>`
+        grageNumber += `<div PK_TID="${PK_TID}" class="grade_item_number grade${PK_TID} fl"></div>`
       }
       return pre + grageNumber + '</div></div>';
     }
@@ -207,9 +207,9 @@
   }
 
   // 调整拇指宽度
-  function adjustThumbWidth(scoreRange) {
+  function adjustThumbWidth(scoreRange, PK_TID) {
     var width = 100 / ( scoreRange.length );
-    $('.grade_item_number').css('width', width + '%');
+    $('.grade' + PK_TID).css('width', width + '%');
   }
 
 
@@ -298,7 +298,7 @@
       fileData.OType = 5;
       fileData.PK_TID = $(this).attr('PK_TID');
       var $imgArr = $(v).find('img');
-      $imgArr.each(function(idx, value){
+      $imgArr.each(function (idx, value) {
         fileData.UploadValue.push($(value).attr('src'));
       })
       req.Result.push(fileData);
@@ -308,8 +308,7 @@
     req.PK_QID = ajaxData.PK_QID;
     req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
-console.log(req);
-//    postAjax(req);  // 发送ajax请求
+    postAjax(req);  // 发送ajax请求
     event.preventDefault();
   });  // end submit
 
@@ -331,31 +330,31 @@ console.log(req);
 
   function postAjax(data) {
     $.ajax({
-        url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
-        type: "POST",
-        headers: {
-          'Auth': Auth
-        },
-        dataType: "json",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        success: function (res) {
-          if (res.ErrCode === 200) {
-            alert('提交成功');
-            var type = iosOrAndroid();
-            if (type === 'iOS') {
-              ios.showToast(JSON.stringify(res));
-            } else if (type === 'Android') {
-              android.showToast(JSON.stringify(res));
+              url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
+              type: "POST",
+              headers: {
+                'Auth': Auth
+              },
+              dataType: "json",
+              contentType: "application/json",
+              data: JSON.stringify(data),
+              success: function (res) {
+                if (res.ErrCode === 200) {
+                  alert('提交成功');
+                  var type = iosOrAndroid();
+                  if (type === 'iOS') {
+                    ios.showToast(JSON.stringify(res));
+                  } else if (type === 'Android') {
+                    android.showToast(JSON.stringify(res));
+                  }
+                } else {
+                  alert(res.ErrMsg);
+                }
+              },
+              error: function (res) {
+                alert('提交失败')
+              }
             }
-          } else {
-            alert(res.ErrMsg);
-          }
-        },
-        error: function (res) {
-          alert('提交失败')
-        }
-      }
     )
   }
 
