@@ -27,6 +27,9 @@
 
     </form>
   </div>
+  <div class="dialog">
+    <div class="loading"></div>
+  </div>
 </div>
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="./javascripts/utils.js"></script>
@@ -58,6 +61,7 @@
       data: JSON.stringify({"PK_QID": PK_QID}),
       success: function (res) {
         console.log(res);
+        $('.dialog').hide();
         if (res.ErrCode === 200) {
           ajaxData = res.Data;
           $('.q_title').text(res.Data.QName);
@@ -242,6 +246,7 @@
   }
 
   $("#form_data").submit(function (event) {
+    $('.dialog').show();
     var req = {Result: []};
 
 //    // 判断是否评分
@@ -339,6 +344,7 @@
               contentType: "application/json",
               data: JSON.stringify(data),
               success: function (res) {
+                $('.dialog').hide();
                 if (res.ErrCode === 200) {
                   alert('提交成功');
                   var type = iosOrAndroid();

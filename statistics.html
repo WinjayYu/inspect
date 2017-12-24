@@ -29,6 +29,9 @@
   <div id="content">
 
   </div>
+  <div class="dialog">
+    <div class="loading"></div>
+  </div>
 </div>
 
 <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
@@ -61,6 +64,7 @@
       dataType: "json",
       contentType: "application/json",
       success: function (data) {
+        $('.dialog').hide();
         var list = [];
         for (var i = 0; i < data.Data.length; i++) {
           list.push({ name: data.Data[i].EName, value: [data.Data[i].Count] });
