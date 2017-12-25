@@ -17,7 +17,7 @@
     <p class="title_text">内蒙古自治区服务质量调查报告</p>
     <div class="type">教育行业</div>
     <p class="header_des">
-      为贯彻落实党的十九大精神，深化内蒙古自治区供给侧结构性改革，推动传统产业优化升级，加快发展现代服务业，瞄准国际标准提高水平，内蒙古质检院以服务质量监测为抓手，定量分析研究全区服务业质量状况。此报告为义务教育行业专项报告，数据显示，全区居民对义务教育服务质量的满意度为71.8，处于“基本满意”的水平。
+      为贯彻落实党的十九大精神，深化内蒙古自治区供给侧结构性改革，推动传统产业优化升级，加快发展现代服务业，瞄准国际标准提高水平，内蒙古质检院以服务质量监测为抓手，定量分析研究全区服务业质量状况。此报告为<span class="type_name"></span>行业专项报告，数据显示，全区居民对<span class="type_name"></span>服务质量的满意度为71.8，处于“基本满意”的水平。
     </p>
     <div class="header_bottom">
       <p class="org_text">内蒙古自治区产品质量研究院</p>
@@ -40,8 +40,10 @@
 <script src="http://apps.bdimg.com/libs/shine.js/0.2.7/shine.min.js"></script>
 <script type="text/javascript">
   var PK_QID = "";
+
   $(function () {
     PK_QID = getUrlParam("PK_QID");
+    getBusinessType();
     GetStatisticsSubmitNumber(function () {
       //获取具体
       GetStatisticsResult(function () {
@@ -51,6 +53,24 @@
       });
     });
   });
+
+  function getBusinessType() {
+    $.ajax({
+      url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetReportBase",
+      type: "POST",
+      dataType: "json",
+      contentType: "application/json",
+      data: JSON.stringify({"PK_QID": PK_QID}),
+      success:function(res) {
+        console.log(res);
+        if(res.ErrCode === 200) {
+          $('.type').text(res.Data.QCName);
+          $('.type_name').text(res.Data.QCName);
+        }
+      }
+    });
+  }
+
   function getUrlParam(name) {
     var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
     var r = window.location.search.substr(1).match(reg);  //匹配目标参数
