@@ -89,6 +89,9 @@
             if (top[i].OType === 5) {
               renderFileUpload(top[i]);
             }
+            if (top[i].OType === 2) {
+              renderGap(top[i]);
+            }
           }
           $form.append('<div id="submit" class="form_submit"><input type="submit" value="提交"></div>');
         }
@@ -208,7 +211,20 @@
       $form.append(template)
       listenUpload();
     }
-  }
+
+    // 填空
+    function renderGap(data) {
+      var isRequired = data.IsRequired === 0 ? '' : 'required';
+      var template =`<div class="item gap" PK_TID="${data.PK_TID}">
+                        <p class="ques_title">${data.TTitle}</p>
+                         <input type="text" class="gap_input" PK_TID="${data.PK_TID}" ${isRequired} />
+                      </div>`
+      $form.append(template);
+    }
+
+  } // end function
+
+
 
   // 调整拇指宽度
   function adjustThumbWidth(scoreRange, PK_TID) {
@@ -310,10 +326,21 @@
       fileData = {UploadValue: []};
     })
 
+    // 填空统计
+    var gapData = {};
+    $(".gap").each(function (i, v) {
+      gapData.OType = 2;
+      gapData.PK_TID = $(this).attr('PK_TID');
+      gapData.InputValue = $(this).find('input').text();
+      req.Result.push(gapData);
+    })
+
+
     req.PK_QID = ajaxData.PK_QID;
     req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
-    postAjax(req);  // 发送ajax请求
+    console.log(req);
+    // postAjax(req);  // 发送ajax请求
     event.preventDefault();
   });  // end submit
 

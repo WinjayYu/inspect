@@ -52,6 +52,7 @@
   background-color: #fff;
   padding-top: 15px;
   margin-top: 6px;
+  padding-bottom: 10px;
 }
 
 .container .item .ques_title {
@@ -168,6 +169,14 @@ input[type="checkbox"] {
 }
 .container .img_wrap {
   padding: 10px 15px;
+}
+
+.container input[type="text"] {
+  border: 1px #eee solid;
+  display: block;
+  width: 90%;
+  margin: 10px auto 0;
+  font-size: 16px;
 }
 
 .statis .header {
