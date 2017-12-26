@@ -350,6 +350,31 @@ input[type="checkbox"] {
   animation: spinner .6s linear infinite;
 }
 
+.container .location .map_a {
+  display: block;
+  width: 170px;
+  height: 30px;
+  line-height: 30px;
+  overflow: hidden;
+  text-align: center;
+  border-radius: 4px;
+  border: solid 1px #53a4f4;
+  color: #53a4f4;
+  padding: 0;
+  cursor: pointer;
+  margin: 10px 0 0 15px;
+}
+
+.container .location .map_a .location_ico {
+  width: 16px;
+  height: 16px;
+  vertical-align: -2px;
+  margin-right: 6px;
+  display: inline-block;
+  background: url(../images/gps.png) no-repeat center;
+  background-size: 16px 16px;
+}
+
 @keyframes spinner {
   to {transform: rotate(360deg);}
 }

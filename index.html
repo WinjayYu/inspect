@@ -35,16 +35,38 @@
 <script src="./javascripts/utils.js"></script>
 <script src="./javascripts/jquery.ui.widget.js"></script>
 <script src="./javascripts/jquery.fileupload.js"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>
 <script>
   var ajaxData;
   var Auth, PK_QID;
 
   function loadAuth(au, pk) {
-    if (au && pk) {
-      Auth = au;
+    if (pk) {
+      Auth = parseInt(au);
       PK_QID = pk;
       renderPage();
     }
+  }
+
+  // 接收app缓存的表单数据
+  function acceptSubmitData(au, req) {
+    Auth = au;
+    postAjax(req);  // 发送ajax请求
+  }
+
+  // 定位
+  function sponsorLocation() {
+    var geolocation = new BMap.Geolocation();
+    $("#show").text("正在定位中");
+    // todo
+    geolocation.getCurrentPosition(function (r) {
+      if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+        $("#show").text('您的位置：' + r.address.province + '-' + r.address.city+':' + r.point.lng + ',' + r.point.lat);
+      }
+      else {
+        alert('failed' + this.getStatus());
+      }
+    });
   }
 
   function renderPage() {
@@ -91,6 +113,9 @@
             }
             if (top[i].OType === 2) {
               renderGap(top[i]);
+            }
+            if(top[i].OType === 8) {
+              renderLocation(top[i]);
             }
           }
           $form.append('<div id="submit" class="form_submit"><input type="submit" value="提交"></div>');
@@ -222,6 +247,21 @@
       $form.append(template);
     }
 
+    // 定位
+    function renderLocation(data) {
+      var template = `<div class="item location">
+                         <p class="ques_title">${data.TTitle}</p>
+                         <a class="map_a" PK_TID="${data.PK_TID}" onclick="sponsorLocation()">
+                            <i class="location_ico"></i>
+                            点击获取定位信息
+                         </a>
+                      </div>
+                              `;
+
+
+      $form.append(template)
+    }
+
   } // end function
 
 
@@ -262,6 +302,8 @@
   }
 
   $("#form_data").submit(function (event) {
+
+
     $('.dialog').show();
     var req = {Result: []};
 
@@ -340,7 +382,14 @@
     req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
 
     console.log(req);
-    // postAjax(req);  // 发送ajax请求
+
+    // 判断是否登陆
+    if(!Auth) {
+      android.logIn(req);
+      return;
+    }
+    
+    postAjax(req);  // 发送ajax请求
     event.preventDefault();
   });  // end submit
 
