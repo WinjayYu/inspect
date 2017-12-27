@@ -261,7 +261,7 @@
                             点击获取定位信息
                          </a>
                          <p class="locationing"></p>
-                         <p class="warn">您的位置：<span class="province"></span><span class="city"></span><span class="lng"></span><span class="lat"></span></p>
+                         <p class="warn">您的位置：<span class="province"></span><span class="city"></span><span class="lng"></span>,<span class="lat"></span></p>
                       </div>
                               `;
 
@@ -386,8 +386,15 @@
     })
 
     // 定位统计
-    if('.warn')
-    var locationData = {};
+    if($('.warn').css('display') !== 'none'){
+      var locationData = {};
+      locationData.OType = 8;
+      locationData.PK_TID = $('.map_a').attr('PK_TID');
+      locationData.InputValue = $('.city').text();
+      locationData.CoordinateValue = $('.lng').text() + ',' + $('.lat').text;
+      req.Result.push(locationData);
+    }
+
 
 
     req.PK_QID = ajaxData.PK_QID;
@@ -422,7 +429,6 @@
   }
 
   function postAjax(data) {
-    alert(Auth);
     $.ajax({
               url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
               type: "POST",
@@ -454,6 +460,6 @@
   }
 
 </script>
-<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>
 </body>
 </html>
