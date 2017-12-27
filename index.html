@@ -57,11 +57,16 @@
   // 定位
   function sponsorLocation() {
     var geolocation = new BMap.Geolocation();
-    $("#show").text("正在定位中");
+    $(".locationing").text("正在定位中...");
     // todo
     geolocation.getCurrentPosition(function (r) {
       if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-        $("#show").text('您的位置：' + r.address.province + '-' + r.address.city+':' + r.point.lng + ',' + r.point.lat);
+        $(".province").text(r.address.province);
+        $(".city").text(r.address.city);
+        $(".lng").text(r.point.lng);
+        $(".lat").text(r.point.lat);
+        $(".locationing").hide();
+        $(".warn").show();
       }
       else {
         alert('failed' + this.getStatus());
@@ -255,6 +260,8 @@
                             <i class="location_ico"></i>
                             点击获取定位信息
                          </a>
+                         <p class="locationing"></p>
+                         <p class="warn" >您的位置：<span class="province"></span>-<span class="city"></span>:<span class="lng"></span>,<span class="lat"></span></p>
                       </div>
                               `;
 
@@ -376,6 +383,10 @@
       gapData.InputValue = $(this).find('input').text();
       req.Result.push(gapData);
     })
+
+    // 定位统计
+    if('.warn')
+    var locationData = {};
 
 
     req.PK_QID = ajaxData.PK_QID;

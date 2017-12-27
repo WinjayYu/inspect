@@ -352,7 +352,7 @@ input[type="checkbox"] {
 
 .container .location .map_a {
   display: block;
-  width: 170px;
+  width: 150px;
   height: 30px;
   line-height: 30px;
   overflow: hidden;
@@ -363,6 +363,7 @@ input[type="checkbox"] {
   padding: 0;
   cursor: pointer;
   margin: 10px 0 0 15px;
+  font-size: 14px;
 }
 
 .container .location .map_a .location_ico {
@@ -373,6 +374,19 @@ input[type="checkbox"] {
   display: inline-block;
   background: url(../images/gps.png) no-repeat center;
   background-size: 16px 16px;
+}
+
+.container .warn {
+  color: #8a96a6;
+  padding: 0 15px;
+  font-size: 14px;
+  display: none;
+}
+
+.container .locationing {
+  color: #8a96a6;
+  padding: 0 15px;
+  font-size: 14px;
 }
 
 @keyframes spinner {
