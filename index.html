@@ -20,7 +20,7 @@
     <p class="call"></p>
   </div>
   <div class="content">
-    <form id="form_data" method="post" onsubmit="handleSubmit()">
+    <form id="form_data" method="post" onsubmit="return handleSubmit(event)">
       <div class="target">
 
       </div>
@@ -35,22 +35,23 @@
 <script src="./javascripts/utils.js"></script>
 <script src="./javascripts/jquery.ui.widget.js"></script>
 <script src="./javascripts/jquery.fileupload.js"></script>
-<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>
+<!--<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>-->
 <script>
   var ajaxData;
   var Auth, PK_QID;
 
   function loadAuth(au, pk) {
     if (pk) {
-      Auth = parseInt(au);
+      Auth = au;
       PK_QID = pk;
       renderPage();
     }
   }
 
   // 接收app缓存的表单数据
-  function acceptSubmitData(au, req) {
+  function acceptSubmitData(au,req) {
     Auth = au;
+    alert(au);
     postAjax(req);  // 发送ajax请求
   }
 
@@ -260,8 +261,6 @@
                             <i class="location_ico"></i>
                             点击获取定位信息
                          </a>
-                         <p class="locationing"></p>
-                         <p class="warn" >您的位置：<span class="province"></span>-<span class="city"></span>:<span class="lng"></span>,<span class="lat"></span></p>
                       </div>
                               `;
 
@@ -292,7 +291,8 @@
   }
   listenGrade();
 
-  function handleSubmit() {
+  function handleSubmit(event) {
+    event.preventDefault();
     return false;
   }
 
@@ -395,8 +395,8 @@
     console.log(req);
 
     // 判断是否登陆
-    if(!Auth) {
-      android.logIn(req);
+    if(Auth === 0 || Auth === '0') {
+      android.logIn(JSON.stringify(req));
       return;
     }
     
@@ -421,6 +421,7 @@
   }
 
   function postAjax(data) {
+    alert(Auth);
     $.ajax({
               url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
               type: "POST",
