@@ -35,7 +35,6 @@
 <script src="./javascripts/utils.js"></script>
 <script src="./javascripts/jquery.ui.widget.js"></script>
 <script src="./javascripts/jquery.fileupload.js"></script>
-<!--<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>-->
 <script>
   var ajaxData;
   var Auth, PK_QID;
@@ -261,6 +260,8 @@
                             <i class="location_ico"></i>
                             点击获取定位信息
                          </a>
+                         <p class="locationing"></p>
+                         <p class="warn">您的位置：<span class="province"></span><span class="city"></span><span class="lng"></span><span class="lat"></span></p>
                       </div>
                               `;
 
@@ -453,5 +454,6 @@
   }
 
 </script>
+<script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU"></script>
 </body>
 </html>
