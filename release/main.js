@@ -1,0 +1,454 @@
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+__webpack_require__(1);
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var ajaxData;
+var Auth, PK_QID;
+
+function loadAuth(au, pk) {
+  if (pk) {
+    Auth = au;
+    PK_QID = pk;
+    renderPage();
+  }
+}
+
+// 接收app缓存的表单数据
+function acceptSubmitData(au, req) {
+  Auth = au;
+  alert(au);
+  postAjax(req); // 发送ajax请求
+}
+
+// 定位
+function sponsorLocation() {
+  var geolocation = new BMap.Geolocation();
+  $(".locationing").text("正在定位中...");
+  // todo
+  geolocation.getCurrentPosition(function (r) {
+    if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+      $(".province").text(r.address.province);
+      $(".city").text(r.address.city);
+      $(".lng").text(r.point.lng);
+      $(".lat").text(r.point.lat);
+      $(".locationing").hide();
+      $(".warn").show();
+    } else {
+      alert('failed' + this.getStatus());
+    }
+  });
+}
+
+function renderPage() {
+  var $form = $('form');
+  var $target = $('.target');
+  $('#submit').click(function (e) {
+    e.preventDefault();
+  });
+  $.ajax({
+    url: "http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/GetSurvey",
+    type: "POST",
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify({ "PK_QID": PK_QID }),
+    success: function success(res) {
+      console.log(res);
+      $('.dialog').hide();
+      if (res.ErrCode === 200) {
+        ajaxData = res.Data;
+        $('.q_title').text(res.Data.QName);
+        $('.call').html(res.Data.Describe.replace(/\n/g, '<br />'));
+        var top = res.Data.Topic;
+        var target = res.Data.Target;
+        $target.append('<p class="target_name">评价对象</p>');
+        for (var j = 0; j < target.length; j++) {
+          renderTarget(target[j], true);
+        }
+
+        for (var i = 0; i < top.length; i++) {
+          if (top[i].OType === 4) {
+            renderDes(top[i]);
+          }
+          if (top[i].OType === 0) {
+            renderRadio(top[i]);
+          }
+          if (top[i].OType === 1) {
+            renderCheckBox(top[i]);
+          }
+          if (top[i].OType === 3) {
+            renderGrade(top[i]);
+          }
+          if (top[i].OType === 5) {
+            renderFileUpload(top[i]);
+          }
+          if (top[i].OType === 2) {
+            renderGap(top[i]);
+          }
+          if (top[i].OType === 8) {
+            renderLocation(top[i]);
+          }
+        }
+        $form.append('<div id="submit" class="form_submit"><input type="submit" value="提交"></div>');
+      }
+    },
+    error: function error(res) {}
+  });
+
+  // 评价对象
+  function renderTarget(data) {
+    var template = "<div class=\"ques_content\">\n                    <div class=\"wrap_input\">\n                    <input class=\"hospital_val\" PK_EID=\"" + data.PK_EID + "\" EName=\"" + data.EName + "\" type=\"radio\" name=\"target\" required> " + data.EName + "\n                    </div>\n                    </div>";
+    $target.append(template);
+  }
+
+  // 描述
+  function renderDes(data) {
+    var template = "<div class=\"item des\" pk_tid=\"" + data.PK_TID + "\">\n                              <p class=\"ques_title\">" + data.TTitle + "</p>\n                              </div>";
+    $form.append(template);
+  }
+
+  //单选
+  function renderRadio(data) {
+    var isRequired = data.IsRequired === 0 ? '' : 'required';
+    var template = "<div class=\"item rad\">\n                             <p class=\"ques_title\">" + data.TTitle + "</p>\n                            ";
+    var option = data.Option;
+    var sub = '';
+    for (var i = 0; i < option.length; i++) {
+      sub += renderSubRad(option[i], data.PK_TID, isRequired, data.OType);
+    }
+    $form.append(template + sub + '</div>');
+  }
+
+  // 单选子选项
+  function renderSubRad(data, name, isRequired, OType) {
+    return "<div class=\"ques_content\">\n              <div class=\"wrap_input\">\n                <input type=\"radio\" PK_TID=\"" + name + "\" OType=\"" + OType + "\" name=\"" + name + "\" value=\"" + data.PK_OID + "\" " + isRequired + "> " + data.TTitle + "\n              </div>\n              </div>";
+  }
+
+  // 多选
+  function renderCheckBox(data) {
+    var isRequired = data.IsRequired === 0 ? '' : 'required';
+    var template = "<div class=\"item che\">\n                              <p class=\"ques_title\">" + data.TTitle + "</p>\n                              ";
+    var option = data.Option;
+    var sub = '';
+    for (var i = 0; i < option.length; i++) {
+      sub += renderSubChe(option[i], data.PK_TID, isRequired, data.OType);
+    }
+
+    $form.append(template + sub + '</div>');
+  }
+
+  function renderSubChe(data, name, isRequired, OType) {
+    return "\n              <div class=\"ques_content\">\n              <div class=\"wrap_input\">\n              <input type=\"checkbox\" OType=\"" + OType + "\" PK_TID=\"" + name + "\" name=" + name + " value=\"" + data.PK_OID + " " + isRequired + "\" > " + data.TTitle + "\n              </div>\n              </div>";
+  }
+
+  // 评分
+  function renderGrade(data) {
+    var isRequired = data.IsRequired === 0 ? '' : 'required';
+    var template = "<div class=\"item grade clear\" TTitle=\"" + data.TTitle + "\">\n                      <p class=\"ques_title\">" + data.TTitle + "</p>";
+    var option = data.Option;
+    var scoreRange = data.ScoreRange;
+    var sub = '';
+    for (var i = 0; i < option.length; i++) {
+      sub += renderSubGra(option[i], data.PK_TID, isRequired, i, scoreRange);
+    }
+    var duffix = "<div class=\"satisfaction clear\">\n                      <div class=\"satisfaction_text text_left fl\">" + data.LeftText + "</div>\n                      <div class=\"satisfaction_text text_middle fl\">" + data.MiddleText + "</div>\n                      <div class=\"satisfaction_text text_right fl\">" + data.RightText + "</div>\n                     </div>";
+    $form.append(template + sub + duffix + '</div>');
+    adjustThumbWidth(scoreRange, data.PK_TID);
+  }
+
+  function renderSubGra(data, PK_TID, isRequired, index, scoreRange) {
+    var pre = "<div class=\"grade_item\">\n                <p class=\"ques_sub_title\">" + data.TTitle + "</p><div class=\"wrap_input wrap_grade clear\">";
+
+    var grageNumber = '';
+    for (var i = 0; i < scoreRange.length; i++) {
+      grageNumber += "<div PK_TID=\"" + PK_TID + "\" class=\"grade_item_number grade" + PK_TID + " fl\"></div>";
+    }
+    return pre + grageNumber + '</div></div>';
+  }
+
+  function renderFileUpload(data) {
+    var isRequired = data.IsRequired === 0 ? '' : 'required';
+    var template = "<div class=\"item file_upload clear\" PK_TID=\"" + data.PK_TID + "\">\n                        <p class=\"ques_title\">" + data.TTitle + "</p>\n                        <div class=\"img_wrap clear \">\n                          <span class=\"btn btn-success fileinput-button fl\">\n                          <i class=\"glyphicon\"></i>\n                          <span></span>\n                              <input type=\"file\" id=\"fileupload\"  name=\"file[]\" data-url=\"http://surveyapi.lanshaoqi.cn/OpenApi/ServicesSurvey/UploadFile\" multiple>\n                          </span>\n                        </div>\n                      </div>";
+    $form.append(template);
+    listenUpload();
+  }
+
+  // 填空
+  function renderGap(data) {
+    var isRequired = data.IsRequired === 0 ? '' : 'required';
+    var template = "<div class=\"item gap\" PK_TID=\"" + data.PK_TID + "\">\n                        <p class=\"ques_title\">" + data.TTitle + "</p>\n                         <input type=\"text\" class=\"gap_input\" PK_TID=\"" + data.PK_TID + "\" " + isRequired + " />\n                      </div>";
+    $form.append(template);
+  }
+
+  // 定位
+  function renderLocation(data) {
+    var template = "<div class=\"item location\">\n                         <p class=\"ques_title\">" + data.TTitle + "</p>\n                         <a class=\"map_a\" PK_TID=\"" + data.PK_TID + "\" onclick=\"sponsorLocation()\">\n                            <i class=\"location_ico\"></i>\n                            \u70B9\u51FB\u83B7\u53D6\u5B9A\u4F4D\u4FE1\u606F\n                         </a>\n                         <p class=\"locationing\"></p>\n                         <p class=\"warn\">\u60A8\u7684\u4F4D\u7F6E\uFF1A<span class=\"province\"></span><span class=\"city\"></span><span class=\"lng\"></span>,<span class=\"lat\"></span></p>\n                      </div>\n                              ";
+
+    $form.append(template);
+  }
+} // end function
+
+
+// 调整拇指宽度
+function adjustThumbWidth(scoreRange, PK_TID) {
+  var width = 100 / scoreRange.length;
+  $('.grade' + PK_TID).css('width', width + '%');
+}
+
+// 监听打分
+function listenGrade() {
+  $('body').on('click', '.grade_item_number', function (e) {
+
+    $(this).siblings().removeClass('grade_item_active');
+
+    $(this).addClass('grade_item_active');
+    $(this).prevAll().addClass('grade_item_active');
+  });
+}
+listenGrade();
+
+function handleSubmit(event) {
+  event.preventDefault();
+  return false;
+}
+
+function listenUpload() {
+  $("#fileupload").fileupload({
+    dataType: 'json',
+    done: function done(e, data) {
+      if (data.result.ErrCode === 200) {
+        alert("上传成功！");
+        $('<img class="uploaded_img fl" />').attr('src', data.result.Data[0]).appendTo('.img_wrap');
+      }
+    }
+  });
+}
+
+$("#form_data").submit(function (event) {
+
+  $('.dialog').show();
+  var req = { Result: [] };
+
+  //    // 判断是否评分
+  //    $('.grade').find('.grade_item').each( function(i, v){
+  //      if(!$(this).find('div').hasClass('selected')) {
+  //        alert('请评分！');
+  //        return;
+  //      }
+  //    })
+
+  // 单选检查
+  $('input[type="radio"][name!="target"]:checked').each(function (index, value) {
+    var type = $(value).attr('type');
+    if (type = 'redio') {
+      req.Result.push(radioData($(value)));
+    }
+  });
+
+  // 多选检查
+  var checkboxNames = [];
+  $('input[type="checkbox"]:checked').each(function (index, value) {
+    checkboxNames.push($(value).attr('name'));
+  });
+  checkboxNames = Array.from(new Set(checkboxNames));
+  //    console.log(checkboxNames);
+
+  for (var i = 0; i < checkboxNames.length; i++) {
+    var temp = { SelectedOption: [] };
+    $('input[name=' + checkboxNames[i] + ']:checked').each(function (index, value) {
+      temp.OType = $(value).attr('OType');
+      temp.PK_TID = $(value).attr('PK_TID');
+      temp.SelectedOption.push(checkboxData($(value)));
+    });
+    req.Result.push(temp);
+  }
+
+  // 评分统计
+  var gradeData = { SelectedOption: [] };
+  $('.grade_item').each(function (i, v) {
+    var $gradeActive = $(v).find('.grade_item_active');
+    if ($gradeActive.length) {
+      gradeData.OType = 3;
+      gradeData.PK_TID = $gradeActive.eq(0).attr('PK_TID');
+      gradeData.SelectedOption.push({ "OptionScoreValue": $gradeActive.length });
+
+      req.Result.push(gradeData);
+      gradeData = { SelectedOption: [] };
+    }
+  });
+
+  // 图片统计
+  var fileData = { UploadValue: [] };
+  $(".file_upload").each(function (i, v) {
+    fileData.OType = 5;
+    fileData.PK_TID = $(this).attr('PK_TID');
+    var $imgArr = $(v).find('img');
+    $imgArr.each(function (idx, value) {
+      fileData.UploadValue.push($(value).attr('src'));
+    });
+    req.Result.push(fileData);
+    fileData = { UploadValue: [] };
+  });
+
+  // 填空统计
+  var gapData = {};
+  $(".gap").each(function (i, v) {
+    gapData.OType = 2;
+    gapData.PK_TID = $(this).attr('PK_TID');
+    gapData.InputValue = $(this).find('input').text();
+    req.Result.push(gapData);
+  });
+
+  // 定位统计
+  if ($('.warn').css('display') !== 'none') {
+    var locationData = {};
+    locationData.OType = 8;
+    locationData.PK_TID = $('.map_a').attr('PK_TID');
+    locationData.InputValue = $('.city').text();
+    locationData.CoordinateValue = $('.lng').text() + ',' + $('.lat').text;
+    req.Result.push(locationData);
+  }
+
+  req.PK_QID = ajaxData.PK_QID;
+  req.PK_EID = $('input[name="target"]:checked').attr('PK_EID');
+
+  console.log(req);
+
+  // 判断是否登陆
+  if (Auth === 0 || Auth === '0') {
+    android.logIn(JSON.stringify(req));
+    return;
+  }
+
+  postAjax(req); // 发送ajax请求
+  event.preventDefault();
+}); // end submit
+
+// 单选数据处理
+function radioData(data) {
+  var obj = { SelectedOption: [] };
+  obj.OType = data.attr('OType');
+  obj.PK_TID = data.attr('PK_TID');
+  obj.SelectedOption.push({ "PK_OID": data.attr('value') });
+  return obj;
+}
+
+// 多选数据处理
+function checkboxData(data) {
+  var SelectedOption = {};
+  SelectedOption.PK_OID = data.attr('value');
+  return SelectedOption;
+}
+
+function postAjax(data) {
+  $.ajax({
+    url: "http://surveyapi.lanshaoqi.cn/OpenApi/General/SubmitSurvey",
+    type: "POST",
+    headers: {
+      'Auth': Auth
+    },
+    dataType: "json",
+    contentType: "application/json",
+    data: JSON.stringify(data),
+    success: function success(res) {
+      $('.dialog').hide();
+      if (res.ErrCode === 200) {
+        alert('提交成功');
+        var type = iosOrAndroid();
+        if (type === 'iOS') {
+          ios.showToast(JSON.stringify(res));
+        } else if (type === 'Android') {
+          android.showToast(JSON.stringify(res));
+        }
+      } else {
+        alert(res.ErrMsg);
+      }
+    },
+    error: function error(res) {
+      alert('提交失败');
+    }
+  });
+}
+
+window.loadAuth = loadAuth;
+window.handleSubmit = handleSubmit;
+window.acceptSubmitData = acceptSubmitData;
+
+/***/ })
+/******/ ]);
