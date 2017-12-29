@@ -1,3 +1,5 @@
+import uniq from 'lodash/uniq';
+
 var ajaxData;
 var Auth, PK_QID;
 
@@ -298,8 +300,7 @@ $("#form_data").submit(function (event) {
   $('input[type="checkbox"]:checked').each(function (index, value) {
     checkboxNames.push($(value).attr('name'));
   });
-  checkboxNames = Array.from(new Set(checkboxNames));
-//    console.log(checkboxNames);
+  checkboxNames = uniq(checkboxNames);
 
   for (var i = 0; i < checkboxNames.length; i++) {
     var temp = {SelectedOption: []}
