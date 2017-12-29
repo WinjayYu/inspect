@@ -84,6 +84,7 @@ function renderPage() {
             renderGap(top[i]);
           }
           if(top[i].OType === 8) {
+            addMap();
             renderLocation(top[i]);
           }
         }
@@ -93,6 +94,14 @@ function renderPage() {
     error: function (res) {
     }
   });
+
+  // 添加地图
+  function addMap() {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src = "http://api.map.baidu.com/getscript?v=2.0&ak=AufxlwWzXVQzcBEdrTIn4oRkfpnMRYjU";
+    document.body.appendChild(script);
+  }
 
   // 评价对象
   function renderTarget(data) {
@@ -425,3 +434,4 @@ function postAjax(data) {
 window.loadAuth = loadAuth;
 window.handleSubmit  = handleSubmit;
 window.acceptSubmitData = acceptSubmitData;
+window.sponsorLocation = sponsorLocation;

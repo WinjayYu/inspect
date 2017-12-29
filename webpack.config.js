@@ -1,11 +1,11 @@
 var path = require('path');
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-
+var CopyWebpackPlugin = require('copy-webpack-plugin');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
 	entry: './javascripts/application.js',
 	output: {
-		filename: '[name].js',
+		filename: 'main.[chunkhash].js',
 		path: path.resolve(__dirname, 'release'),
 	},
 	resolve: {
@@ -21,4 +21,7 @@ module.exports = {
         	},
 		]
 	},
+	plugins: [
+		new HtmlWebpackPlugin()
+	]
 }
